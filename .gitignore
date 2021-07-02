@@ -1,0 +1,16 @@
+.dub
+docs.json
+__dummy.html
+docs/
+bin/
+/bgaencadvance
+bgaencadvance.so
+bgaencadvance.dylib
+bgaencadvance.dll
+bgaencadvance.a
+bgaencadvance.lib
+bgaencadvance-test-*
+*.exe
+*.o
+*.obj
+*.lst

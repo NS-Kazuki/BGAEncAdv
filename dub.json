@@ -1,0 +1,15 @@
+{
+	"authors": [
+		"Bluvel"
+	],
+	"copyright": "Copyright © 2021, Bluvel",
+	"dependencies": {
+		"ffmpeg4d": "~>4.1.0",
+		"jpeg-turbo": "~>1.3.1",
+		"libpng": "~>1.6.17"
+	},
+  "targetPath": "bin",
+	"description": "BMS file to Movie file",
+	"license": "Free",
+	"name": "bgaencadvance"
+}
