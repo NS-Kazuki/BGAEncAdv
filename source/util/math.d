@@ -29,7 +29,7 @@ unittest{
 }
 T get_LCM(T, U)(T a, U b) if(isIntegral!(T) && isIntegral!(U))
 out{
-  assert(a * b == 0 || __result % a == 0 && __result % b == 0);
+  assert(a == 0 || b == 0 || (__result % a == 0 && __result % b == 0));
 }
 do{
   //
@@ -52,16 +52,16 @@ do{
   }
   j = b % i;
   if(j == 0){
-    return a * b / i;
+    return a / i * b;
   }
   while(true){
     i %= j;
     if(i == 0){
-      return a * b / j;
+      return a / j * b;
     }
     j %= i;
     if(j == 0){
-      return a * b / i;
+      return a / i * b;
     }
   }
 }

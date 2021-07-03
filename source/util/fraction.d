@@ -1,6 +1,7 @@
 module util.fraction;
 
 import std.bigint;
+import std.conv;
 import std.traits;
 
 import util.code;
@@ -148,6 +149,10 @@ struct fraction(T) if(isIntegral!(T) || is(T == BigInt)){
         return;
       }
     }
+  }
+  //
+  string toString(){
+    return numerator.to!(string)~"/"~denominator.to!(string);
   }
 }
 

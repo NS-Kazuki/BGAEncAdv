@@ -7,6 +7,9 @@ import loader.charfile;
 import std.bigint;
 import std.stdio;
 
+immutable ZZ = 36*36; /// ZZ定義の限界数
+immutable LINEMAX = 1000; /// 小節の限界数
+
 struct line_list{
   uint type;
   uint value;
@@ -285,13 +288,13 @@ enum playstyle{
   THIRTEEN_FP = 0x09  // OCT / FP
 }
 
-alias delta_hide!(int) int_delta;
-alias delta_hide!(long) long_delta;
-alias delta_hide!(fractionI) fractionI_delta;
-alias delta_hide!(fractionL) fractionL_delta;
-alias delta_hide!(argb) argb_delta;
-alias delta_hide!(trimming) trimming_delta;
-alias delta_hide!(string) string_delta;
+alias int_delta = delta_hide!(int);
+alias long_delta = delta_hide!(long);
+alias fractionI_delta = delta_hide!(fractionI);
+alias fractionL_delta = delta_hide!(fractionL);
+alias argb_delta = delta_hide!(argb);
+alias trimming_delta = delta_hide!(trimming);
+alias string_delta = delta_hide!(string);
 
 /// BMSプレイ時に使うデータ
 class BMS_data{
@@ -315,9 +318,9 @@ class BMS_data{
     //
     bool poor_overray = false;
     //
-    string[36*36] wav_list;
-    string[36*36] bmp_list;
-    trimming[36*36] bga_list;
+    string[ZZ] wav_list;
+    string[ZZ] bmp_list;
+    trimming[ZZ] bga_list;
     delta_show[] note_list;
     //
     int_delta[] background_list;
@@ -346,17 +349,17 @@ class BMS_data{
 
 /// BMS解析用の一時データ
 struct BMS_temp{
-  fractionI[uint] BPM_list;
-  fractionI[uint] stop_list;
-  fractionI[uint] rank_list;
-  string[uint] wav_list;
-  exwav[][uint] exwav_list;
-  string[uint] bmp_list;
-  exbmp[uint] exbmp_list;
-  string[uint] text_list;
-  argb[uint] argb_list;
-  line_data[][1000] line_list;
-  size_t[1000] list_size;
+  fractionI[size_t] BPM_list;
+  fractionI[size_t] stop_list;
+  fractionI[size_t] rank_list;
+  string[size_t] wav_list;
+  exwav[][size_t] exwav_list;
+  string[size_t] bmp_list;
+  exbmp[size_t] exbmp_list;
+  string[size_t] text_list;
+  argb[size_t] argb_list;
+  line_data[][LINEMAX] line_list;
+  size_t[LINEMAX] list_size;
   //
   fractionL[size_t] meter_list;
   //

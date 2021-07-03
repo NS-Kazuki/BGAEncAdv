@@ -22,8 +22,7 @@ import loader.data;
 import loader.error;
 import loader.charfile;
 
-alias std.string.join join;
-alias std.string.CaseSensitive CaseSensitive;
+alias CaseSensitive = std.string.CaseSensitive;
 
 private{
   version(WIDE){
@@ -51,6 +50,8 @@ private{
   string[] DIFFICULTY_INSANE = ["Insane", "Another", "Plus", "[A]", "(A)"];
 
   string[] ENCODE = ["ASCII", "SHIFT-JIS", "UHC", "UTF-8", "UTF-16LE", "UTF-16BE", "UTF-32LE", "UTF-32BE"];
+
+  immutable __DIV = 240_000_000;
 }
 
 /**
@@ -121,7 +122,7 @@ private{
       if(get_size(bmstemp.charset) == 1){
         char[] temp;
         f.readln(temp);
-        mode = read_line(convert!(CONVERTCODE)(replace_vaild(temp, bmstemp.charset), bmstemp.charset), lines);
+        mode = read_line(convert!(CONVERTCODE)(replace_vaild(temp.strip, bmstemp.charset), bmstemp.charset), lines);
       }else if(get_size(bmstemp.charset) == 2){
         throw new ReadException("Sorry, \"readLineW\" is not exist.");
       }else if(get_size(bmstemp.charset) == 4){
@@ -1045,7 +1046,7 @@ private{
     bms.HSmaxBPM = bms.startBPM;
     bms.HSminBPM = bms.startBPM;
     // ゲージ分解能
-    foreach(size_t linum; 0..1000){
+    foreach(size_t linum; 0..LINEMAX){
       if(linum in bmstemp.meter_list){
         bar_bottom = get_LCM(bar_bottom, bmstemp.meter_list[linum].denominator);
       }
@@ -1086,9 +1087,9 @@ private{
     BigInt gauge_point;
     BigInt total_position;
     fractionL position;
-    gauge_point = (bpm_LCM / bms.startBPM).numerator;
+    gauge_point = (bpm_LCM / bms.startBPM).numerator * temp.denominator * temp.denominator;
     position.denominator = bar_bottom;
-    foreach(size_t linum; 0..1000){
+    foreach(size_t linum; 0..LINEMAX){
       /*
        一旦ライン上に全て置き、その後補正をかける
       */
@@ -1128,7 +1129,7 @@ private{
         case Object_type.BGM:
           if(bms.wav_list[linelist[i].value].length > 0 && same_front(linelist, i) == false){
             ulong time;
-            time = (total_position * 240_000_000 / delta).toLong;
+            time = (total_position * __DIV / delta).toLong;
             if(currentBPM < 0){
               time = long.max;
             }
@@ -1145,7 +1146,7 @@ private{
         case Object_type.BGA_POOR:
           if(kaburi(linelist, i) == false){
             if(currentBPM > 0){
-              bms.background_list[background_size] = int_delta(linelist[i].type, linelist[i].value, (total_position * 240_000_000 / delta).toLong);
+              bms.background_list[background_size] = int_delta(linelist[i].type, linelist[i].value, (total_position * __DIV / delta).toLong);
               background_size += 1;
               if(bms.background_list.length <= background_size){
                 bms.background_list.length *= 2;
@@ -1159,7 +1160,7 @@ private{
         case Object_type.ALPHA_POOR:
           if(kaburi(linelist, i) == false){
             if(currentBPM > 0){
-              bms.background_list[argb_size] = int_delta(linelist[i].type, linelist[i].value, (total_position * 240_000_000 / delta).toLong);
+              bms.background_list[argb_size] = int_delta(linelist[i].type, linelist[i].value, (total_position * __DIV / delta).toLong);
               argb_size += 1;
               if(bms.argb_list.length <= argb_size){
                 bms.argb_list.length *= 2;
@@ -1172,7 +1173,7 @@ private{
             if(currentBPM > 0){
               gauge_point = (bpm_LCM / linelist[i].value).numerator;
               currentBPM = fractionI(linelist[i].value, 1);
-              bms.BPM_list[BPM_size] = fractionI_delta(Object_type.BPM,currentBPM, (total_position * 240_000_000 / delta).toLong);
+              bms.BPM_list[BPM_size] = fractionI_delta(Object_type.BPM,currentBPM, (total_position * __DIV / delta).toLong);
               BPM_size += 1;
               if(bms.BPM_list.length <= BPM_size){
                 bms.BPM_list.length *= 2;
@@ -1191,7 +1192,7 @@ private{
               if(currentBPM > 0){
                 gauge_point = (bpm_LCM / bmstemp.BPM_list[linelist[i].value]).numerator;
                 currentBPM = bmstemp.BPM_list[linelist[i].value];
-                bms.BPM_list[BPM_size] = fractionI_delta(Object_type.BPM, bmstemp.BPM_list[linelist[i].value], (total_position * 240_000_000 / delta).toLong);
+                bms.BPM_list[BPM_size] = fractionI_delta(Object_type.BPM, bmstemp.BPM_list[linelist[i].value], (total_position * __DIV / delta).toLong);
                 BPM_size += 1;
                 if(bms.BPM_list.length <= BPM_size){
                   bms.BPM_list.length *= 2;
@@ -1214,13 +1215,13 @@ private{
                 fractionB temp2;
                 temp2 = bmstemp.stop_list[linelist[i].value];
                 total_position += (temp2 * gauge_LCM * bar_bottom * gauge_point).numerator;
-                bms.stop_list[stop_size] = fractionI_delta(Object_type.STOP, bmstemp.stop_list[linelist[i].value], (total_position * 240_000_000 / delta).toLong);
+                bms.stop_list[stop_size] = fractionI_delta(Object_type.STOP, bmstemp.stop_list[linelist[i].value], (total_position * __DIV / delta).toLong);
                 stop_size += 1;
                 if(bms.stop_list.length <= stop_size){
                   bms.stop_list.length *= 2;
                 }
                 //
-                bms.stop_list[stop_size] = fractionI_delta(Object_type.RESTART, fractionI(0, 1), (total_position * 240_000_000 / delta).toLong);
+                bms.stop_list[stop_size] = fractionI_delta(Object_type.RESTART, fractionI(0, 1), (total_position * __DIV / delta).toLong);
                 stop_size += 1;
                 if(bms.stop_list.length <= stop_size){
                   bms.stop_list.length *= 2;
@@ -1234,7 +1235,7 @@ private{
         case Object_type.TEXT:
           if(kaburi(linelist, i) == false){
             if(linelist[i].value in bmstemp.text_list){
-              bms.text_list[text_size] = string_delta(Object_type.TEXT, bmstemp.text_list[linelist[i].value], (total_position * 240_000_000 / delta).toLong);
+              bms.text_list[text_size] = string_delta(Object_type.TEXT, bmstemp.text_list[linelist[i].value], (total_position * __DIV / delta).toLong);
               stop_size += 1;
               if(bms.text_list.length <= text_size){
                 bms.text_list.length *= 2;
@@ -1247,7 +1248,7 @@ private{
         case Object_type.JUDGE:
           if(kaburi(linelist, i) == false){ 
             if(linelist[i].value in bmstemp.rank_list){
-              bms.rank_list[rank_size] = fractionI_delta(Object_type.JUDGE, bmstemp.rank_list[linelist[i].value], (total_position * 240_000_000 / delta).toLong);
+              bms.rank_list[rank_size] = fractionI_delta(Object_type.JUDGE, bmstemp.rank_list[linelist[i].value], (total_position * __DIV / delta).toLong);
               stop_size += 1;
               if(bms.rank_list.length <= rank_size){
                 bms.rank_list.length *= 2;
@@ -1263,7 +1264,7 @@ private{
         case Object_type.ARGB_POOR:
           if(linelist[i].value in bmstemp.argb_list){
             if(kaburi(linelist, i) == false){
-              bms.argb_list[argb_size] = argb_delta(linelist[i].type, bmstemp.argb_list[linelist[i].value], (total_position * 240_000_000 / delta).toLong);
+              bms.argb_list[argb_size] = argb_delta(linelist[i].type, bmstemp.argb_list[linelist[i].value], (total_position * __DIV / delta).toLong);
               argb_size += 1;
               if(bms.argb_list.length <= argb_size){
                 bms.argb_list.length *= 2;
@@ -1286,7 +1287,7 @@ private{
           temp2.denominator = (gauge_length / get_GCD(linelist[i].position, gauge_length)).toLong;
           temp2.reduct();
           if(kaburi(linelist, i) == false){
-            time = (total_position * 240_000_000 / delta).toLong;
+            time = (total_position * __DIV / delta).toLong;
             if(currentBPM < 0){
               time = long.max;
             }
@@ -1307,7 +1308,7 @@ private{
             }else{
               bms.note_list[note_size] = delta_show(linelist[i].type, linelist[i].value, time, position + temp2);
               if(bmstemp.LNobject.include(linelist[i].value)){
-                sizediff_t k;
+                ptrdiff_t k;
                 k = before_note(bms.note_list, bms.note_list[note_size].type, note_size);
                 if(k > 0){
                   switch(bms.note_list[k].type / 36){
@@ -1415,7 +1416,7 @@ private{
       }
       //
       total_position += (gauge_length - last_position) * gauge_point;
-      bms.bar_list[bar_size] = delta_show(Object_type.LINE, 0, (total_position * 240_000_000 / delta).toLong, position);
+      bms.bar_list[bar_size] = delta_show(Object_type.LINE, 0, (total_position * __DIV / delta).toLong, position);
       bar_size += 1;
       if(bms.bar_list.length <= bar_size){
         bms.bar_list.length *= 2;
@@ -1448,11 +1449,11 @@ private{
     }
     // TITLEからSUBTITLEを分離
     if(bms.title.length >= 2 && bms.subtitle.length == 0){
-      sizediff_t c;
+      ptrdiff_t c;
       c = SUBTITLE_END.lastIndexOf(bms.title[$-1]);
       if(c >= 0){
         writefln("debug %s, %d", bms.title, c);
-        for(sizediff_t i = bms.title.length - 2; i > 0; i -= 1){
+        for(ptrdiff_t i = bms.title.length - 2; i > 0; i -= 1){
           if(bms.title[i] == SUBTITLE_START[c]){
             bms.subtitle = bms.title[i..$];
             bms.title.length = i;
@@ -1496,7 +1497,7 @@ private{
    * 同音
   */
   bool same_front(ref line_list[] linelist, size_t start){
-    for(sizediff_t i = (start - 1); i >= 0; i -= 1){
+    for(ptrdiff_t i = (start - 1); i >= 0; i -= 1){
       if(linelist[start].position > linelist[i].position){
         return false;
       }
@@ -1516,7 +1517,7 @@ private{
    * 同レーンにある直前のノートタイプ
   */
   size_t before_note(ref delta_show[] linelist, uint type, size_t start){
-    for(sizediff_t i = (start - 1); i >= 0; i -= 1){
+    for(ptrdiff_t i = (start - 1); i >= 0; i -= 1){
       if(type % 36 == linelist[i].type % 36){
         if(((linelist[i].type / 36) & 1) == 1){
           if(linelist[i].type / 36 == Object_upper.VISIBLE_1P ||

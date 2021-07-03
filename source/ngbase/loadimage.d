@@ -813,11 +813,13 @@ class ImageBitmap{
             }else{
               if(compress == 1){
                 foreach(j; 0..buffer[i]){
+                  if(standard_map.length <= data_position(y, x)){break;} // はみ出しデータ対策
                   standard_map[data_position(y, x)] = colors[buffer[i+1]];
                   x += 1;
                 }
               }else{
                 foreach(j; 0..buffer[i]){
+                  if(standard_map.length <= data_position(y, x)){break;} // はみ出しデータ対策
                   if(j & 1){
                     standard_map[data_position(y, x)] = colors[buffer[i+1] & 0x0F];
                   }else{

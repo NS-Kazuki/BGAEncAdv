@@ -6,18 +6,18 @@ version(unittest){
 
 import std.traits;
 
-alias RingBuffer!(char) RingBufferC;
-alias RingBuffer!(byte) RingBufferB;
-alias RingBuffer!(ubyte) RingBufferUB;
-alias RingBuffer!(short) RingBufferS;
-alias RingBuffer!(ushort) RingBufferUS;
-alias RingBuffer!(int) RingBufferI;
-alias RingBuffer!(uint) RingBufferUI;
-alias RingBuffer!(long) RingBufferL;
-alias RingBuffer!(ulong) RingBufferUL;
-alias RingBuffer!(float) RingBufferF;
-alias RingBuffer!(double) RingBufferD;
-alias RingBuffer!(real) RingBufferR;
+alias RingBufferC = RingBuffer!(char);
+alias RingBufferB = RingBuffer!(byte);
+alias RingBufferUB = RingBuffer!(ubyte);
+alias RingBufferS = RingBuffer!(short);
+alias RingBufferUS = RingBuffer!(ushort);
+alias RingBufferI = RingBuffer!(int);
+alias RingBufferUI = RingBuffer!(uint);
+alias RingBufferL = RingBuffer!(long);
+alias RingBufferUL = RingBuffer!(ulong);
+alias RingBufferF = RingBuffer!(float);
+alias RingBufferD = RingBuffer!(double);
+alias RingBufferR = RingBuffer!(real);
 
 class RingBuffer(T){
   private{
