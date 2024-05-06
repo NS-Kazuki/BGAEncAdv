@@ -201,7 +201,7 @@ fraction!(T) toFraction(T, C)(C str, bool abs = false) if(isSomeString!(C)){
     zero = true;
   }
   foreach(i; 1..str.length){
-    if(border){
+    if(border && (str[i].toEN > '0' && str[i].toEN <= '9')){
       result.denominator *= 10;
     }
     if(str[i].toEN == '.'){
